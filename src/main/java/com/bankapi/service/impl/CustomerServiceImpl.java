@@ -2,6 +2,7 @@ package com.bankapi.service.impl;
 
 import com.bankapi.dao.DatabaseHandler;
 import com.bankapi.model.Customer;
+import com.bankapi.model.Response;
 import com.bankapi.service.CustomerService;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -13,6 +14,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Inject
     private DatabaseHandler handler;
+<<<<<<< HEAD
 
     private static final Logger LOG = Logger.getLogger(EmployeeServiceImpl.class.getName());
 
@@ -22,12 +24,24 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer save(Customer entity) {
         return handler.getCUSTOMERS().put(entity.getClientIdentifier(), entity);
 
+=======
+
+    @Override
+    public Customer save(Customer entity) {
+        handler.getCUSTOMERS().put(entity.getClientIdentifier(), entity);
+        return entity;
+>>>>>>> parent of 97be80d... Thirteen commit
     }
 
     @Override
     public Customer update(Customer entity) {
+<<<<<<< HEAD
         return handler.getCUSTOMERS().put(entity.getClientIdentifier(), entity);
 
+=======
+        handler.getCUSTOMERS().put(entity.getClientIdentifier(), entity);
+        return entity;
+>>>>>>> parent of 97be80d... Thirteen commit
     }
 
     @Override
@@ -68,6 +82,7 @@ public class CustomerServiceImpl implements CustomerService {
         update(loggedInUser);
         return true;
     }
+<<<<<<< HEAD
 
     @Override
     public boolean checkAvail(String customerId) {
@@ -83,5 +98,7 @@ public class CustomerServiceImpl implements CustomerService {
     public void setLoggedInUser(Customer loggedInUser) {
         this.loggedInUser = loggedInUser;
     }
+=======
+>>>>>>> parent of 97be80d... Thirteen commit
 
 }
