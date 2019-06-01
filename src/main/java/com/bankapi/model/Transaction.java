@@ -1,22 +1,29 @@
 package com.bankapi.model;
 
+import java.util.concurrent.atomic.AtomicLong;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Transaction {
 
+    private static final int INITIAL_ID = 5;
+    AtomicLong counter;
     private Long id;
     private String transactionId;
     private TransactionData transactionData;
     private String recipientAccount;
     private int numberOfTransaction;
     private String IBAN;
+    private String employeeId;
 
     public Transaction() {
+        this.counter = new AtomicLong(INITIAL_ID);
+        setId();
     }
 
     public Transaction(Long id, String transactionId, TransactionData transactionData, String recipientAccount, int numberOfTransaction, String IBAN) {
-        this.id = id;
+        this.counter = new AtomicLong(INITIAL_ID);
+        setId();
         this.transactionId = transactionId;
         this.transactionData = transactionData;
         this.recipientAccount = recipientAccount;
@@ -28,8 +35,8 @@ public class Transaction {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    private void setId() {
+        this.id = counter.longValue();
     }
 
     public String getTransactionId() {
@@ -72,4 +79,11 @@ public class Transaction {
         this.IBAN = IBAN;
     }
 
+    public String getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
+    }
 }

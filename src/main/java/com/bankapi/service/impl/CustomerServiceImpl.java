@@ -4,28 +4,30 @@ import com.bankapi.dao.DatabaseHandler;
 import com.bankapi.model.Customer;
 import com.bankapi.service.CustomerService;
 import java.util.Set;
+import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public abstract class CustomerServiceImpl implements CustomerService {
-    
+public class CustomerServiceImpl implements CustomerService {
+
     @Inject
     private DatabaseHandler handler;
-    
-       
+
+    private static final Logger LOG = Logger.getLogger(EmployeeServiceImpl.class.getName());
+
     Customer loggedInUser = null;
 
     @Override
     public Customer save(Customer entity) {
         return handler.getCUSTOMERS().put(entity.getClientIdentifier(), entity);
-        
+
     }
 
     @Override
     public Customer update(Customer entity) {
-      return   handler.getCUSTOMERS().put(entity.getClientIdentifier(), entity);
-        
+        return handler.getCUSTOMERS().put(entity.getClientIdentifier(), entity);
+
     }
 
     @Override
@@ -52,14 +54,32 @@ public abstract class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public boolean checkAvail(String clientIdentifier) {
-        return handler.getCUSTOMERS().get(clientIdentifier) != null;
+    public boolean authenticate(Customer p) {
+        loggedInUser = find(p.getEmployeeId());
+        if (loggedInUser == null) {
+            LOG.info("Employee not registered!");
+            return false;
+        }
+        if (!loggedInUser.getPassword().trim().equals(p.getPassword().trim())) {
+            LOG.info("Passwords do not match!");
+            return false;
+        }
+        loggedInUser.setStatus(true);
+        update(loggedInUser);
+        return true;
     }
- @Override
+
+    @Override
+    public boolean checkAvail(String customerId) {
+        return find(customerId) != null;
+    }
+
+    @Override
     public Customer getLoggedInUser() {
         return loggedInUser;
     }
- @Override
+
+    @Override
     public void setLoggedInUser(Customer loggedInUser) {
         this.loggedInUser = loggedInUser;
     }

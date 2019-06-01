@@ -5,6 +5,7 @@ import com.bankapi.model.Transaction;
 import com.bankapi.model.Response;
 import com.bankapi.model.TransactionData;
 import com.bankapi.service.AccountService;
+import com.bankapi.service.CustomerService;
 import com.bankapi.service.TransactionService;
 import java.util.Random;
 
@@ -14,24 +15,24 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.PathParam;
 
 @Path("/transaction")
 @Consumes(MediaType.APPLICATION_XML)
 @Produces(MediaType.APPLICATION_XML)
-@Singleton
 public class TransactionController {
 
-
     private final AccountService accountService;
-
+    private final CustomerService customerService;
     private final TransactionService transactionService;
 
+    String loggedIn;
+
     @Inject
-    public TransactionController(AccountService accountService, TransactionService transactionService) {
+    public TransactionController(AccountService accountService, CustomerService customerService, TransactionService transactionService) {
         this.accountService = accountService;
+        this.customerService = customerService;
         this.transactionService = transactionService;
     }
 
@@ -39,6 +40,11 @@ public class TransactionController {
     @Path("/debitAccount")
     public Response debitAccount(Transaction p) {
         Response response = new Response();
+        if (checkLoginStatus()) {
+            response.setStatus(false);
+            response.setMessage("You need to login first");
+            return response;
+        }
         if (transactionService.find(p.getTransactionId()) != null) {
             response.setStatus(false);
             response.setMessage("Transaction Already Exists");
@@ -55,6 +61,11 @@ public class TransactionController {
     @Path("/savingAccount")
     public Response savingAccount(Transaction p) {
         Response response = new Response();
+        if (checkLoginStatus()) {
+            response.setStatus(false);
+            response.setMessage("You need to login first");
+            return response;
+        }
         if (transactionService.find(p.getTransactionId()) != null) {
             response.setStatus(false);
             response.setMessage("Transaction Already Exists");
@@ -71,6 +82,11 @@ public class TransactionController {
     @Path("/internationalAccount")
     public Response internationalAccount(Transaction p) {
         Response response = new Response();
+        if (checkLoginStatus()) {
+            response.setStatus(false);
+            response.setMessage("You need to login first");
+            return response;
+        }
         if (transactionService.find(p.getTransactionId()) != null) {
             response.setStatus(false);
             response.setMessage("Transaction Already Exists");
@@ -83,18 +99,25 @@ public class TransactionController {
         return response;
     }
 
-
     @GET
     @Path("/getAll")
-    public Transaction[] getAllCustomers() {
+    public Transaction[] getAllTransactions() {
+        if (checkLoginStatus()) {
+
+        }
         return transactionService.findAll();
     }
 
     @GET
-    @Path("/{clientIdentifier}/getDummyTransaction")
-    public Transaction getDummyCustomer(@PathParam("clientIdentifier") String clientIdentifier) {
-        Transaction p = new Transaction();
-        p.setId(Long.valueOf(1));
+    @Path("/{transactionId}/get")
+    public Transaction getTransaction(@PathParam("transactionId") String transactionId) {
+        return transactionService.find(transactionId);
+    }
+
+    @GET
+    @Path("/{transactionId}/getDummyTransaction")
+    public Transaction getDummyTransaction(@PathParam("transactionId") String transactionId) {
+        Transaction p = new Transaction();        
         p.setIBAN("CER123");
         p.setNumberOfTransaction(1);
         p.setRecipientAccount("1234");
@@ -106,7 +129,6 @@ public class TransactionController {
         return p;
     }
 
-    
     Response performTransaction(Transaction p, Account sender, Account recipient, Double amount, Response response) {
         if (sender == null || recipient == null) {
             response.setStatus(false);
@@ -117,6 +139,13 @@ public class TransactionController {
             }
             return response;
         }
+        
+        loggedIn = this.customerService.getLoggedInUser().getClientIdentifier();
+        if(!loggedIn.equals(sender.getClientIdentifier())){
+         response.setStatus(false);   
+         response.setMessage("Transaction failed, Sender account not found!");
+        }
+        
         Double recipientCurrentAmount = recipient.getCurrentAmount();
         Double senderCurrentAmount = sender.getCurrentAmount();
         if (senderCurrentAmount == 0 || senderCurrentAmount <= amount) {
@@ -128,10 +157,10 @@ public class TransactionController {
         sender.setCurrentAmount(senderAmount);
         Double recipientAmount = recipientCurrentAmount + amount;
         recipient.setCurrentAmount(recipientAmount);
-        if (accountService.update(sender)!=null || accountService.update(recipient) != null) {
+        if (accountService.update(sender) != null || accountService.update(recipient) != null) {
             response.setStatus(true);
             response.setMessage("Transaction successfull");
-           
+
             p.setTransactionId(transactionId());
             transactionService.save(p);
             return response;
@@ -140,11 +169,15 @@ public class TransactionController {
         response.setStatus(false);
         return response;
     }
-    
+
     public static String transactionId() {
         Random rand = new Random();
         int randomNum = rand.nextInt(599999998) + 1;
-        String convid = String.valueOf(randomNum);
+        String convid = String.valueOf("BANK" + randomNum);
         return convid;
+    }
+
+    public boolean checkLoginStatus() {
+        return this.customerService.getLoggedInUser() == null;
     }
 }

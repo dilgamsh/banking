@@ -1,5 +1,6 @@
 package com.bankapi.model;
 
+import java.util.concurrent.atomic.AtomicLong;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -7,6 +8,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Customer {
 
+    private static final int INITIAL_ID = 1;
+    AtomicLong counter;
     private Long id;
     @NotNull(message = "Client Identifier is a required field")
     @Size(min = 3, max = 6, message = "Client Identifier must be equal to or greater than 3 characters and less than 6 characters")
@@ -18,26 +21,33 @@ public class Customer {
     private String lastName;
     private String birthDate;
     private String joinDate;
+    private String employeeId;
+    private boolean status;
 
     public Customer() {
+         this.counter = new AtomicLong(INITIAL_ID);
+         setId();
     }
 
-    public Customer(Long id, String clientIdentifier, String password, String firstName, String lastName, String birthDate, String joinDate) {
-        this.id = id;
+    public Customer(String clientIdentifier, String password, String firstName, String lastName, String birthDate, String joinDate, String employeeId, boolean status) {
+        this.counter = new AtomicLong(INITIAL_ID);
+        this.id = counter.longValue();
         this.clientIdentifier = clientIdentifier;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthDate;
         this.joinDate = joinDate;
+        this.employeeId = employeeId;
+        this.status = status;
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    private void setId() {
+        this.id = counter.longValue();
     }
 
     public String getClientIdentifier() {
@@ -86,6 +96,22 @@ public class Customer {
 
     public void setJoinDate(String joinDate) {
         this.joinDate = joinDate;
+    }
+
+    public String getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 
 }

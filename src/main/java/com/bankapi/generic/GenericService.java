@@ -1,7 +1,6 @@
 package com.bankapi.generic;
 
 import com.bankapi.model.Response;
-import java.util.List;
 
 public interface GenericService<T extends Object> {
 
@@ -14,5 +13,6 @@ public interface GenericService<T extends Object> {
     T find(String identifier);
 
     T[] findAll();
+  
 
 }

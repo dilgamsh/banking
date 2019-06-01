@@ -2,6 +2,7 @@ package com.bankapi.service.impl;
 
 import com.bankapi.dao.DatabaseHandler;
 import com.bankapi.model.Account;
+import com.bankapi.model.Response;
 import com.bankapi.service.AccountService;
 import java.util.Set;
 import javax.inject.Inject;
@@ -15,14 +16,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account save(Account entity) {
-        handler.getACCOUNTS().put(entity.getAccountIdentifier(), entity);
-        return entity;
+        return handler.getACCOUNTS().put(entity.getAccountIdentifier(), entity);
     }
 
     @Override
     public Account update(Account entity) {
-        handler.getACCOUNTS().put(entity.getAccountIdentifier(), entity);
-        return entity;
+       return handler.getACCOUNTS().put(entity.getAccountIdentifier(), entity);
     }
 
     @Override

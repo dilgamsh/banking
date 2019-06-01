@@ -1,10 +1,13 @@
 package com.bankapi.model;
 
+import java.util.concurrent.atomic.AtomicLong;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Account {
 
+    private static final int INITIAL_ID = 1;
+    AtomicLong counter;
     private Long id;
     private String bankCode;
     private String clientIdentifier;
@@ -12,25 +15,35 @@ public class Account {
     private double currentAmount;
     private String accountType;
     private String IBAN;
-
-    public Account() {
+    private String employeeId;
+    
+    public Account(Account acc) {
+        this.counter = new AtomicLong(INITIAL_ID);
+        setId();
     }
 
-    public Account(Long id, String bankCode, String clientIdentifier, String accountIdentifier, double currentAmount, String accountType) {
-        this.id = id;
+    public Account() {
+        this.counter = new AtomicLong(INITIAL_ID);
+        setId();
+    }
+
+    public Account(String bankCode, String clientIdentifier, String accountIdentifier, double currentAmount, String accountType, String employeeId) {
+        this.counter = new AtomicLong(INITIAL_ID);
+        setId();
         this.bankCode = bankCode;
         this.clientIdentifier = clientIdentifier;
         this.accountIdentifier = accountIdentifier;
         this.currentAmount = currentAmount;
         this.accountType = accountType;
+        this.employeeId = employeeId;
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    private void setId() {
+        this.id = counter.longValue();
     }
 
     public String getBankCode() {
@@ -79,6 +92,14 @@ public class Account {
 
     public void setIBAN(String IBAN) {
         this.IBAN = IBAN;
+    }
+
+    public String getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
     }
 
 }
