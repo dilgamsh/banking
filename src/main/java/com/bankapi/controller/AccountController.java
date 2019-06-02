@@ -23,13 +23,13 @@ public class AccountController {
 
     private final AccountService accountService;
     private final CustomerService customerService;
-    
-    
+    private final EmployeeService employeeService;
 
     @Inject
-    public AccountController(AccountService accountService, CustomerService customerService,EmployeeService employeeService) {
+    public AccountController(AccountService accountService, CustomerService customerService, EmployeeService employeeService) {
         this.accountService = accountService;
         this.customerService = customerService;
+        this.employeeService = employeeService;
     }
 
     private static final Logger LOG = Logger.getLogger(AccountController.class.getName());
@@ -37,9 +37,9 @@ public class AccountController {
     @POST
     @Path("/regularAccount")
     public Response regularAccount(Account p) {
-        Response response = new Response();        
-        if(checkLoginStatus()){
-        response.setStatus(false);
+        Response response = new Response();
+        if (checkLoginStatus()) {
+            response.setStatus(false);
             response.setMessage("You need to login first");
             return response;
         }
@@ -54,7 +54,7 @@ public class AccountController {
             response.setMessage("Account Already Exists");
             return response;
         }
-       
+        p.setEmployeeId(this.employeeService.getLoggedInUser().getEmployeeId());
         accountService.save(p);
         response.setStatus(true);
         response.setMessage("Account created successfully");
@@ -65,12 +65,17 @@ public class AccountController {
     @Path("/internationalAccount")
     public Response internationalAccount(Account p) {
         Response response = new Response();
+        if (checkLoginStatus()) {
+            response.setStatus(false);
+            response.setMessage("You need to login first");
+            return response;
+        }
         if (accountService.find(p.getAccountIdentifier()) != null) {
             response.setStatus(false);
             response.setMessage("Account Already Exists");
             return response;
         }
-       
+        p.setEmployeeId(this.employeeService.getLoggedInUser().getEmployeeId());
         accountService.save(p);
         response.setStatus(true);
         response.setMessage("Account created successfully");
@@ -81,12 +86,17 @@ public class AccountController {
     @Path("/savingAccount")
     public Response savingAccount(Account p) {
         Response response = new Response();
+        if (checkLoginStatus()) {
+            response.setStatus(false);
+            response.setMessage("You need to login first");
+            return response;
+        }
         if (accountService.find(p.getAccountIdentifier()) != null) {
             response.setStatus(false);
             response.setMessage("Account Already Exists");
             return response;
         }
-       
+        p.setEmployeeId(this.employeeService.getLoggedInUser().getEmployeeId());
         accountService.save(p);
         response.setStatus(true);
         response.setMessage("Account created successfully");
@@ -97,6 +107,11 @@ public class AccountController {
     @Path("/{accountIdentifier}/delete")
     public Response deleteAccount(@PathParam("accountIdentifier") String accountIdentifier) {
         Response response = new Response();
+        if (checkLoginStatus()) {
+            response.setStatus(false);
+            response.setMessage("You need to login first");
+            return response;
+        }
         if (accountService.find(accountIdentifier) == null) {
             response.setStatus(false);
             response.setMessage("Account Doesn't Exists");
@@ -111,6 +126,9 @@ public class AccountController {
     @GET
     @Path("/{accountIdentifier}/get")
     public Account getAccount(@PathParam("accountIdentifier") String accountIdentifier) {
+        if (checkLoginStatus()) {
+            return null;
+        }
         return accountService.find(accountIdentifier);
     }
 
@@ -129,12 +147,14 @@ public class AccountController {
     @GET
     @Path("/getAll")
     public Account[] getAllAccounts() {
+        if (checkLoginStatus()) {
+            return null;
+        }
         return accountService.findAll();
     }
 
-    public boolean checkLoginStatus(){
-        return this.customerService.getLoggedInUser()==null;
+    public boolean checkLoginStatus() {
+        return this.employeeService.getLoggedInUser() == null;
     }
-    
-    
+
 }

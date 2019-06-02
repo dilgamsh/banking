@@ -11,7 +11,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.concurrent.atomic.AtomicLong;
 import javax.inject.Inject;
 
 @Path("/employee")
@@ -20,47 +19,31 @@ import javax.inject.Inject;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
+    Employee loggedInUser=null;
 
     @Inject
     public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
     }
 
-    Employee loggedInUser = null;
-    
-    private static final int INITIAL_ID = 1;
-    private final AtomicLong counter = new AtomicLong(INITIAL_ID);
-
     @POST
     @Path("/add")
     public Response addEmployee(Employee p) {
         Response response = new Response();
+        if (checkLoginStatus()) {
+            response.setStatus(false);
+            response.setMessage("You need to login first");
+            return response;
+        }
         if (employeeService.find(p.getEmployeeId()) != null) {
             response.setStatus(false);
             response.setMessage("Employee Already Exists");
             return response;
         }
-       
+
         employeeService.save(p);
         response.setStatus(true);
         response.setMessage("Employee created successfully");
-        return response;
-    }
-
-    @POST
-    @Path("/login")
-    public Response loginEmployee(Employee p) {
-        Response response = new Response();
-        if (!employeeService.authenticate(p)) {
-            response.setStatus(false);
-            response.setMessage("Invalid credentials!");
-            return response;
-        }
-        loggedInUser=getEmployee(p.getEmployeeId());
-        loggedInUser.setStatus(true);
-        employeeService.save(loggedInUser);
-        response.setStatus(true);
-        response.setMessage("Login successfull");
         return response;
     }
 
@@ -68,6 +51,11 @@ public class EmployeeController {
     @Path("/{employeeId}/delete")
     public Response deleteEmployee(@PathParam("employeeId") String employeeId) {
         Response response = new Response();
+        if (checkLoginStatus()) {
+            response.setStatus(false);
+            response.setMessage("You need to login first");
+            return response;
+        }
         employeeService.delete(employeeId);
         response.setStatus(true);
         response.setMessage("Employee deleted successfully");
@@ -77,15 +65,17 @@ public class EmployeeController {
     @GET
     @Path("/{employeeId}/get")
     public Employee getEmployee(@PathParam("employeeId") String employeeId) {
+        if (checkLoginStatus()) {
+            return null;
+        }
         return employeeService.find(employeeId);
     }
 
-    
     @Path("/{employeeId}/getDummyEmployee")
     public Employee getDummyEmployee(@PathParam("employeeId") String employeeId) {
         Employee p = new Employee();
-        p.setId(Long.valueOf(1234));
         p.setEmployeeId(employeeId);
+        p.setNames("Jacob Juma");
         p.setRole("Teller");
         p.setStatus(true);
         return p;
@@ -94,7 +84,14 @@ public class EmployeeController {
     @GET
     @Path("/getAll")
     public Employee[] getAllEmployees() {
+        if (checkLoginStatus()) {
+            return null;
+        }
         return employeeService.findAll();
+    }
+
+    public boolean checkLoginStatus() {
+        return this.employeeService.getLoggedInUser() == null;
     }
 
 }
