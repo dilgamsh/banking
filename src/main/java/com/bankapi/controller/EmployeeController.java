@@ -40,6 +40,7 @@ public class EmployeeController {
             response.setMessage("Employee Already Exists");
             return response;
         }
+         p.setBankName("DILGAM BANK");
 
         employeeService.save(p);
         response.setStatus(true);

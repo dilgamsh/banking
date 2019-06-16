@@ -14,7 +14,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Inject
     private DatabaseHandler handler;
 
-    private static final Logger LOG = Logger.getLogger(EmployeeServiceImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(CustomerServiceImpl.class.getName());
 
     Customer loggedInUser = null;
 
@@ -55,9 +55,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public boolean authenticate(Customer p) {
-        loggedInUser = find(p.getEmployeeId());
+        loggedInUser = find(p.getClientIdentifier());
         if (loggedInUser == null) {
-            LOG.info("Employee not registered!");
+            LOG.info("Customer not registered!");
             return false;
         }
         if (!loggedInUser.getPassword().trim().equals(p.getPassword().trim())) {

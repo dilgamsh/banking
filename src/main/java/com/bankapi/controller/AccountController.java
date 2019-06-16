@@ -1,6 +1,7 @@
 package com.bankapi.controller;
 
 import com.bankapi.model.Account;
+import com.bankapi.model.Employee;
 import com.bankapi.model.Response;
 import com.bankapi.service.AccountService;
 import com.bankapi.service.CustomerService;
@@ -54,7 +55,9 @@ public class AccountController {
             response.setMessage("Account Already Exists");
             return response;
         }
+        p.setBankName("DILGAM BANK");
         p.setEmployeeId(this.employeeService.getLoggedInUser().getEmployeeId());
+   
         accountService.save(p);
         response.setStatus(true);
         response.setMessage("Account created successfully");
@@ -76,6 +79,7 @@ public class AccountController {
             return response;
         }
         p.setEmployeeId(this.employeeService.getLoggedInUser().getEmployeeId());
+         p.setBankName("DILGAM BANK");
         accountService.save(p);
         response.setStatus(true);
         response.setMessage("Account created successfully");
@@ -97,6 +101,7 @@ public class AccountController {
             return response;
         }
         p.setEmployeeId(this.employeeService.getLoggedInUser().getEmployeeId());
+         p.setBankName("DILGAM BANK");
         accountService.save(p);
         response.setStatus(true);
         response.setMessage("Account created successfully");
@@ -147,10 +152,13 @@ public class AccountController {
     @GET
     @Path("/getAll")
     public Account[] getAllAccounts() {
-        if (checkLoginStatus()) {
-            return null;
-        }
+        Employee employee=employeeService.getLoggedInUser();
+     if(employee!=null){
+         if(employee.getRole().equals("Director")){
         return accountService.findAll();
+         }
+    }
+     return null;
     }
 
     public boolean checkLoginStatus() {

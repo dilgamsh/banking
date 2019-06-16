@@ -7,6 +7,7 @@ import org.testng.Assert;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.After;
+import org.testng.annotations.Test;
 
 public class EmployeeControllerTest {
 

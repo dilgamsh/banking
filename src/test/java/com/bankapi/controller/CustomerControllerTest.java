@@ -11,7 +11,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.After;
 
-public class CustomerControllerTest {
+public class  CustomerControllerTest{
 
     @After
     public void loginEmployee() {

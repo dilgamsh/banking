@@ -1,6 +1,7 @@
 package com.bankapi.controller;
 
 import com.bankapi.model.Customer;
+import com.bankapi.model.Employee;
 import com.bankapi.model.Response;
 import com.bankapi.service.CustomerService;
 import com.bankapi.service.EmployeeService;
@@ -19,8 +20,8 @@ import javax.inject.Inject;
 @Produces(MediaType.APPLICATION_XML)
 public class CustomerController {
 
-    private  final CustomerService customerService;
-    private  final EmployeeService employeeService;
+    private final CustomerService customerService;
+    private final EmployeeService employeeService;
 
     @Inject
     public CustomerController(CustomerService customerService, EmployeeService employeeService) {
@@ -42,6 +43,7 @@ public class CustomerController {
             response.setMessage("Customer Already Exists");
             return response;
         }
+        p.setBankName("DILGAM BANK");
         p.setEmployeeId(this.employeeService.getLoggedInUser().getEmployeeId());
         customerService.save(p);
         response.setStatus(true);
@@ -67,7 +69,9 @@ public class CustomerController {
         response.setStatus(true);
         response.setMessage("Customer deleted successfully");
         return response;
+
     }
+//customer/T1200US/get
 
     @GET
     @Path("/{clientIdentifier}/get")
@@ -94,10 +98,13 @@ public class CustomerController {
     @GET
     @Path("/getAll")
     public Customer[] getAllCustomers() {
-        if (checkLoginStatus()) {
-            return null;
+        Employee employee = employeeService.getLoggedInUser();
+        if (employee != null) {
+            if (employee.getRole().equals("Director")) {
+                return customerService.findAll();
+            }
         }
-        return customerService.findAll();
+        return null;
     }
 
     public boolean checkLoginStatus() {

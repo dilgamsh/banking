@@ -1,7 +1,5 @@
 package com.bankapi.generic;
 
-import com.bankapi.model.Response;
-
 public interface GenericService<T extends Object> {
 
     T save(T entity);

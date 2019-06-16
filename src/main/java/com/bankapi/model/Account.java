@@ -8,6 +8,8 @@ public class Account {
 
     private static final int INITIAL_ID = 1;
     AtomicLong counter;
+    private String bankName = "DILGAM BANK";
+
     private Long id;
     private String bankCode;
     private String clientIdentifier;
@@ -16,7 +18,7 @@ public class Account {
     private String accountType;
     private String IBAN;
     private String employeeId;
-    
+
     public Account(Account acc) {
         this.counter = new AtomicLong(INITIAL_ID);
         setId();
@@ -25,6 +27,8 @@ public class Account {
     public Account() {
         this.counter = new AtomicLong(INITIAL_ID);
         setId();
+        this.setBankName(bankName);
+        this.id = this.counter.getAndIncrement();
     }
 
     public Account(String bankCode, String clientIdentifier, String accountIdentifier, double currentAmount, String accountType, String employeeId) {
@@ -36,6 +40,20 @@ public class Account {
         this.currentAmount = currentAmount;
         this.accountType = accountType;
         this.employeeId = employeeId;
+        this.setBankName(bankName);
+        this.id = this.counter.getAndIncrement();
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getBankName() {
+        return bankName;
     }
 
     public Long getId() {

@@ -23,15 +23,21 @@ public class Customer {
     private String joinDate;
     private String employeeId;
     private boolean status;
-
+ private String bankName="DILGAM BANK";
+ 
     public Customer() {
          this.counter = new AtomicLong(INITIAL_ID);
          setId();
     }
 
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
+    }
+
     public Customer(String clientIdentifier, String password, String firstName, String lastName, String birthDate, String joinDate, String employeeId, boolean status) {
         this.counter = new AtomicLong(INITIAL_ID);
         this.id = counter.longValue();
+        this.setBankName(bankName);
         this.clientIdentifier = clientIdentifier;
         this.password = password;
         this.firstName = firstName;
@@ -40,6 +46,10 @@ public class Customer {
         this.joinDate = joinDate;
         this.employeeId = employeeId;
         this.status = status;
+    }
+
+    public String getBankName() {
+        return bankName;
     }
 
     public Long getId() {

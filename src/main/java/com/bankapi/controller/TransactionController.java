@@ -1,12 +1,15 @@
 package com.bankapi.controller;
 
 import com.bankapi.model.Account;
+import com.bankapi.model.Employee;
 import com.bankapi.model.Transaction;
 import com.bankapi.model.Response;
 import com.bankapi.model.TransactionData;
 import com.bankapi.service.AccountService;
 import com.bankapi.service.CustomerService;
+import com.bankapi.service.EmployeeService;
 import com.bankapi.service.TransactionService;
+import java.time.LocalDate;
 import java.util.Random;
 
 import javax.ws.rs.Consumes;
@@ -26,14 +29,16 @@ public class TransactionController {
     private final AccountService accountService;
     private final CustomerService customerService;
     private final TransactionService transactionService;
+     private final EmployeeService employeeService;
 
     String loggedIn;
 
     @Inject
-    public TransactionController(AccountService accountService, CustomerService customerService, TransactionService transactionService) {
+    public TransactionController(AccountService accountService, CustomerService customerService, TransactionService transactionService, EmployeeService employeeService) {
         this.accountService = accountService;
         this.customerService = customerService;
         this.transactionService = transactionService;
+        this.employeeService=employeeService;
     }
 
     @POST
@@ -50,6 +55,7 @@ public class TransactionController {
             response.setMessage("Transaction Already Exists");
             return response;
         }
+         p.setBankName("DILGAM BANK");
         Account senderAccount = accountService.find(p.getTransactionData().getSenderAccount());
         Account recipientAccount = accountService.find(p.getRecipientAccount());
         Double transactionAmount = p.getTransactionData().getAmount();
@@ -71,6 +77,7 @@ public class TransactionController {
             response.setMessage("Transaction Already Exists");
             return response;
         }
+         p.setBankName("DILGAM BANK");
         Account senderAccount = accountService.find(p.getTransactionData().getSenderAccount());
         Account recipientAccount = accountService.find(p.getRecipientAccount());
         Double transactionAmount = p.getTransactionData().getAmount();
@@ -92,6 +99,7 @@ public class TransactionController {
             response.setMessage("Transaction Already Exists");
             return response;
         }
+         p.setBankName("DILGAM BANK");
         Account senderAccount = accountService.find(p.getTransactionData().getSenderAccount());
         Account recipientAccount = accountService.find(p.getRecipientAccount());
         Double transactionAmount = p.getTransactionData().getAmount();
@@ -102,22 +110,25 @@ public class TransactionController {
     @GET
     @Path("/getAll")
     public Transaction[] getAllTransactions() {
-        if (checkLoginStatus()) {
-
-        }
+     Employee employee=employeeService.getLoggedInUser();
+     if(employee!=null){
+         if(employee.getRole().equals("Director")){
         return transactionService.findAll();
+         }
+     }
+     return null;
     }
 
     @GET
     @Path("/{transactionId}/get")
     public Transaction getTransaction(@PathParam("transactionId") String transactionId) {
-        return transactionService.find(transactionId);
+          return transactionService.find(transactionId);
     }
 
     @GET
     @Path("/{transactionId}/getDummyTransaction")
     public Transaction getDummyTransaction(@PathParam("transactionId") String transactionId) {
-        Transaction p = new Transaction();        
+        Transaction p = new Transaction();
         p.setIBAN("CER123");
         p.setNumberOfTransaction(1);
         p.setRecipientAccount("1234");
@@ -139,13 +150,13 @@ public class TransactionController {
             }
             return response;
         }
-        
+
         loggedIn = this.customerService.getLoggedInUser().getClientIdentifier();
-        if(!loggedIn.equals(sender.getClientIdentifier())){
-         response.setStatus(false);   
-         response.setMessage("Transaction failed, Sender account not found!");
+        if (!loggedIn.equals(sender.getClientIdentifier())) {
+            response.setStatus(false);
+            response.setMessage("Transaction failed, Sender account not found!");
         }
-        
+
         Double recipientCurrentAmount = recipient.getCurrentAmount();
         Double senderCurrentAmount = sender.getCurrentAmount();
         if (senderCurrentAmount == 0 || senderCurrentAmount <= amount) {
@@ -160,7 +171,7 @@ public class TransactionController {
         if (accountService.update(sender) != null || accountService.update(recipient) != null) {
             response.setStatus(true);
             response.setMessage("Transaction successfull");
-
+            p.setTransactionDate(String.valueOf(LocalDate.now()));
             p.setTransactionId(transactionId());
             transactionService.save(p);
             return response;
