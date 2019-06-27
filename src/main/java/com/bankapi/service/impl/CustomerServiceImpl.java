@@ -2,28 +2,30 @@ package com.bankapi.service.impl;
 
 import com.bankapi.dao.DatabaseHandler;
 import com.bankapi.model.Customer;
-import com.bankapi.model.Response;
 import com.bankapi.service.CustomerService;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class CustomerServiceImpl implements CustomerService {
-
+public abstract class CustomerServiceImpl implements CustomerService {
+    
     @Inject
     private DatabaseHandler handler;
+    
+       
+    Customer loggedInUser = null;
 
     @Override
     public Customer save(Customer entity) {
-        handler.getCUSTOMERS().put(entity.getClientIdentifier(), entity);
-        return entity;
+        return handler.getCUSTOMERS().put(entity.getClientIdentifier(), entity);
+        
     }
 
     @Override
     public Customer update(Customer entity) {
-        handler.getCUSTOMERS().put(entity.getClientIdentifier(), entity);
-        return entity;
+      return   handler.getCUSTOMERS().put(entity.getClientIdentifier(), entity);
+        
     }
 
     @Override
@@ -52,6 +54,14 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public boolean checkAvail(String clientIdentifier) {
         return handler.getCUSTOMERS().get(clientIdentifier) != null;
+    }
+ @Override
+    public Customer getLoggedInUser() {
+        return loggedInUser;
+    }
+ @Override
+    public void setLoggedInUser(Customer loggedInUser) {
+        this.loggedInUser = loggedInUser;
     }
 
 }

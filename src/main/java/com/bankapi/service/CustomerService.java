@@ -7,4 +7,8 @@ public interface CustomerService extends GenericService<Customer> {
 
     public boolean checkAvail(String clientIdentifier);
 
+    public Customer getLoggedInUser();
+
+    public void setLoggedInUser(Customer loggedInUser);
+    
 }
